@@ -34,7 +34,7 @@ export const useIpStore = defineStore('iplist', {
     },
     getters: {
         sortedList: (state) => {
-           const key = state.sortBy as keyof IpInfo;
+           const key = state.sortBy as keyof IpInfo || 'time';
            const dir = state.sortOrder == 'asc' ? -1 : 1;
             console.log(state.ipItems)
             state.ipItems.sort((a, b) => { console.log('sorting', a, b); return 0} );

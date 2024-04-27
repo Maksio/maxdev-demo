@@ -1,8 +1,8 @@
 <template>
-  <div class="sort-button">
+  <div class="sort-button" :class="{active: hasState}">
     <el-dropdown trigger="click">
-      <el-button class="sort-button">
-        {{ activeState.label }}
+      <el-button class="sort-button" >
+        {{ activeState?.label || 'Сортировка' }}
         <el-icon class="el-icon--right custom-drop-icon">
           <arrow-down/>
         </el-icon>
@@ -13,11 +13,12 @@
           <el-dropdown-item
               v-for="state in states" :key="state.direction"
               class="dropdown__item"
-              :class="{active: activeState.direction == state.direction}"
-              @click="activeState = state"
+              :class="{active: activeState && activeState?.direction == state.direction}"
+              @click="activateState(state)"
           >
             {{ state.label }}
-            <el-icon v-if="activeState.direction == state.direction" class="el-icon--right1">
+            <el-icon v-if="activeState && activeState.direction == state.direction"
+                     class="el-icon--right1">
               <Select/>
             </el-icon>
           </el-dropdown-item>
@@ -28,7 +29,7 @@
 </template>
 
 <script setup lang="ts">
-import {defineProps, withDefaults, ref, watch} from 'vue'
+import {defineProps, withDefaults, ref, watch, computed} from 'vue'
 import {ArrowDown, Select} from '@element-plus/icons-vue'
 import {useIpStore} from "@/store";
 
@@ -38,17 +39,26 @@ const props = withDefaults(defineProps<{
   field: 'country',
 })
 
-
-const states = [
+type State = {
+  direction: 'asc' | 'desc';
+  label: string;
+}
+const states: State[] = [
   {direction: 'desc', label: 'A-Z'},
   {direction: 'asc', label: 'Z-A'},
 ]
 
-const activeState = ref(states[0])
+const activeState = ref()
 const store = useIpStore();
 
+const hasState = computed(() => Boolean(activeState.value))
+
+const activateState = (state: State) => {
+  activeState.value = activeState.value == state ? null : state;
+}
+
 watch(activeState, (v) => {
-  const sorter = { field: props.field, direction: activeState.value.direction };
+  const sorter = { field: props.field, direction: activeState.value?.direction };
   store.sort(sorter);
 })
 
@@ -68,6 +78,11 @@ watch(activeState, (v) => {
 }
 .sort-button .el-dropdown button {
   padding: 4px 8px;
+  background: #F2F0F0;
+  color: #929496;
+  border: none;
+}
+.sort-button.active .el-dropdown button {
   color: #403CF7;
   border: 1px solid #403CF7;
 }
