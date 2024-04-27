@@ -1,40 +1,81 @@
 <template>
-  <div class="ip-search">
-    <el-input
-        v-model="search"
-        :formatter="inputFormatter"
-        :prefix-icon="Search"
-        class="search-input"
-        placeholder="Type IP address here..."></el-input>
-  </div>
+
+  <el-input
+      :model-value="search"
+      @input="inputSearch"
+      @change="updateSearch"
+      :prefix-icon="Search"
+      class="search-input"
+      placeholder="Type IP address here..."></el-input>
+
 </template>
 
 <script setup lang="ts">
-import {ref} from "vue";
-import { Search } from '@element-plus/icons-vue'
+import {ref, defineProps, withDefaults, defineEmits, watch} from "vue";
+import {Search} from '@element-plus/icons-vue'
+import {useRouter} from "vue-router";
+import debounce from 'lodash.debounce';
 
-const search = ref<string>('')
+const router = useRouter();
 
-function inputFormatter(value: string) {
-  return `${value}`
+const props = withDefaults(defineProps<{
+  confirm?: boolean;
+  mapQuery?: boolean;
+  modelValue: string;
+  debounce?: number;
+}>(), {confirm: false, modelValue: '', debounce: 0});
+
+const search = ref<string>(props.modelValue)
+const confirmValue = ref<string>(search.value)
+
+const inputSearch = (value: string) => {
+  search.value = value;
+  if (!props.confirm) {
+    confirmValue.value = value;
+  }
 }
+const updateSearch = (value: string) => {
+  search.value = value;
+  if (props.confirm) {
+    confirmValue.value = value;
+  }
+}
+
+const emit = defineEmits(['update:modelValue'])
+
+type QueryType = {
+  query: {
+    search?: string;
+  }
+}
+watch(confirmValue, debounce(() => {
+  if (props.mapQuery) {
+    const query: QueryType = { query: {}};
+    if (confirmValue.value) {
+      query.query.search = confirmValue.value
+    }
+    router.replace(query)
+  }
+  emit('update:modelValue', confirmValue.value);
+}, props.debounce))
 
 </script>
 
 <style>
-.ip-search {
-  display: flex;
-  width: 100%;
-  align-items: center;
-  justify-content: center;
-}
 .search-input {
   max-width: 460px;
 }
+
 .search-input .el-input__inner {
   margin: 8px 12px 8px 4px;
 }
-.search-input .el-icon svg{
+
+.search-input input.el-input__inner,
+.search-input input.el-input__inner::-webkit-input-placeholder {
+  font-family: 'Poppins', 'Arial', sans-serif;
+}
+
+.search-input .el-icon svg {
   transform: scale(1.43);
   color: #494949;
 }

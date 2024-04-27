@@ -19,7 +19,7 @@ import TopNavigation from "@/components/layout/TopNavigation.vue";
 }
 
 body {
-  font-family: Poppins;
+  font-family: 'Poppins';
 }
 
 .common-layout {

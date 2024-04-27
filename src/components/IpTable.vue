@@ -1,10 +1,9 @@
 <template>
-  <el-input type="text"
-            v-model="tableSearch"
-            autofocus
-            class="multi-search__input"
-            placeholder="Введите IP адреса"
-  ></el-input>
+  <ip-search v-model="tableSearch"
+             placeholder="Поиск по таблице"
+             map-query
+             :debounce=2000
+  />
   <div style="display: none;" data-comment="Fixing el-table refreshing bug">{{ sortedList }}</div>
   <el-table
     :data="sortedList"
@@ -70,10 +69,10 @@
       </template>
     </el-table-column>
 
-    <el-table-column type="default">
+    <el-table-column type="default"  width="44" class-name="no-paddings">
       <template #default="scope">
         <div class="custom-row">
-          <state-button>{{ scope.row.ip }}</state-button>
+          <state-button :state="'success'">{{ scope.row.ip }}</state-button>
         </div>
       </template>
     </el-table-column>
@@ -86,10 +85,11 @@ import {IpInfo, useIpStore} from "@/store";
 import {storeToRefs} from "pinia";
 import FlagImage from "@/components/FlagImage.vue";
 import "@fontsource/inter";
-import StateButton from "@/components/StateButton.vue";
-import SortButton from "@/components/SortButton.vue";
+import StateButton from "@/components/buttons/StateButton.vue";
+import SortButton from "@/components/buttons/SortButton.vue";
 import {ref, watch} from "vue";
-import CellButton from "@/components/CellButton.vue";
+import CellButton from "@/components/buttons/CellButton.vue";
+import IpSearch from "@/components/IpSearch.vue";
 
 const store = useIpStore()
 const { sortedList } = storeToRefs(store);
@@ -177,5 +177,12 @@ td.el-table__cell.hoverable:hover .cell
   border: none;
   background: #F8E8E8;
   color: #791919;
+}
+.no-paddings,
+.el-table__cell.no-paddings,
+.no-paddings .cell
+{
+  padding: 0;
+  margin: 0;
 }
 </style>

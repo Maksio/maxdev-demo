@@ -2,8 +2,12 @@ import {defineStore} from 'pinia'
 import {computed} from "vue";
 
 const makeRequest = async (ip: string) => {
-    const response = await fetch(`http://ip-api.com/json/${ip}`);
-    return response.json();
+    try {
+        const response = await fetch(`http://ip-api.com/json/${ip}`);
+        return response.json();
+    } catch (error) {
+        console.error('Error fetching ip api', error);
+    }
 }
 
 type IpResponse = {
@@ -12,11 +16,13 @@ type IpResponse = {
     query: string;
 }
 
+export type IpState = 'success' | 'busy' | 'fail';
 export type IpInfo = {
     time: string;
     ip: string;
     country: string;
     city: string;
+    state: IpState;
 }
 
 type Sorting = {
@@ -64,7 +70,11 @@ export const useIpStore = defineStore('iplist', {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 const { query, city, country } = el;
-                this.items.push({ time: String(+Date.now()), ip: query, city, country })
+                const randomInt = query.split('.').reduce((a: string, b: string) => Number(a) + Number(b)) % 3;
+                const states: IpState[] = ['success', 'busy', 'fail'];
+                const state: IpState = states[randomInt];
+                console.log('state', state)
+                this.items.push({ time: String(+Date.now()), ip: query, city, country, state })
             });
         },
         sort(payload: Sorting) {
