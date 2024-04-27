@@ -5,7 +5,7 @@
             class="multi-search__input"
             placeholder="Введите IP адреса"
   ></el-input>
-  {{ sortBy }} {{ sortOrder }}
+  <div style="display: none;" data-comment="Fixing el-table refreshing bug">{{ sortedList }}</div>
   <el-table
     :data="sortedList"
     style="width: 100%;"
@@ -15,14 +15,16 @@
     @selection-change="onSelectRow"
   >
     <el-table-column type="selection" width="48"/>
-    <el-table-column prop="ip" label="IP">
+
+    <el-table-column prop="ip" label="IP" class-name="hoverable">
       <template #header="scope">
         <div class="custom-row header">
           {{ scope.column.label }}
           <el-button size="small" type="danger"
                      plain
                      class="header-button danger"
-                     v-show="rowsSelected"
+                     v-show="selectedRows.length > 1"
+                     @click="deleteSelectedRows"
           >
             Удалить выбранные
           </el-button>
@@ -30,9 +32,21 @@
       </template>
 
       <template #default="scope">
-        <div class="custom-row">
-          <flag-image :country="scope.row.country" />
-          {{ scope.row.ip }}
+        <div class="custom-row space-between"
+             @mouseenter="hoveredIp = scope.row.ip"
+             @mouseleave="hoveredIp = null"
+        >
+          <div>
+            <flag-image :country="scope.row.country" />
+            {{ scope.row.ip }}
+          </div>
+          <cell-button action="copy"
+                       v-show="isHovered(scope.row.ip)"
+                       v-clipboard="scope.row.ip"
+          />
+          <cell-button action="delete"
+                       v-show="isSelected(scope.row.ip)"
+                       @click="deleteRow(scope.row.ip)"/>
         </div>
       </template>
     </el-table-column>
@@ -68,21 +82,45 @@
 </template>
 
 <script setup lang="ts">
-import {useIpStore} from "@/store";
+import {IpInfo, useIpStore} from "@/store";
 import {storeToRefs} from "pinia";
 import FlagImage from "@/components/FlagImage.vue";
 import "@fontsource/inter";
 import StateButton from "@/components/StateButton.vue";
 import SortButton from "@/components/SortButton.vue";
-import {ref} from "vue";
+import {ref, watch} from "vue";
+import CellButton from "@/components/CellButton.vue";
 
 const store = useIpStore()
-const { sortedList, sortBy, sortOrder } = storeToRefs(store);
+const { sortedList } = storeToRefs(store);
 
 const tableSearch = ref('');
-const onSelectRow = (params) => {
-  console.log(params)
+const hoveredIp = ref();
+
+const selectedRows = ref<IpInfo[]>([])
+const onSelectRow = (rows?: IpInfo[]) => {
+  selectedRows.value = rows as IpInfo[];
 }
+
+const deleteRow = (ip: string) => {
+  store.deleteIp(ip)
+}
+
+const deleteSelectedRows = () => {
+  selectedRows.value.map((row: IpInfo) => row.ip).forEach((ip: string) => deleteRow(ip))
+
+  selectedRows.value = [];
+}
+
+const isSelected = (ip: string) => selectedRows.value.filter((row: IpInfo) => row.ip === ip).length > 0;
+
+const isHovered = (ip: string) => {
+  return hoveredIp.value === ip && !isSelected(ip);
+}
+
+watch(tableSearch, () => {
+  store.filter(tableSearch.value)
+})
 </script>
 
 <style>
@@ -107,6 +145,11 @@ const onSelectRow = (params) => {
   align-items: center;
   gap: 8px;
 }
+.custom-row.space-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 .custom-row.header {
   font-family: 'Inter';
   font-size: 16px;
@@ -116,6 +159,11 @@ const onSelectRow = (params) => {
   justify-content: space-between;
   padding: 4px 4px;
   color: #2C2C2C;
+}
+td.el-table__cell.hoverable:hover,
+td.el-table__cell.hoverable:hover .cell
+{
+  background: #EBEEF4;
 }
 .header-button {
   font-family: 'Inter';

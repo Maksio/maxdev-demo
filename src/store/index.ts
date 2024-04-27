@@ -12,7 +12,7 @@ type IpResponse = {
     query: string;
 }
 
-type IpInfo = {
+export type IpInfo = {
     time: string;
     ip: string;
     country: string;
@@ -27,20 +27,25 @@ type Sorting = {
 export const useIpStore = defineStore('iplist', {
     state: () => {
         return {
-            ipItems: [] as IpInfo[],
+            items: [] as IpInfo[],
             sortBy: 'country',
             sortOrder: 'desc',
+            filterValue: '',
         }
     },
     getters: {
         sortedList: (state) => {
            const key = state.sortBy as keyof IpInfo || 'time';
            const dir = state.sortOrder == 'asc' ? -1 : 1;
-            console.log(state.ipItems)
-            state.ipItems.sort((a, b) => { console.log('sorting', a, b); return 0} );
-           return state.ipItems.sort((a: IpInfo, b: IpInfo) => a[key].localeCompare(b[key]) * dir)
+
+           const sorted = state.items.sort((a: IpInfo, b: IpInfo) => a[key].localeCompare(b[key]) * dir);
+
+           if (state.filterValue) {
+               return sorted.filter((row: IpInfo) => row.ip.includes(state.filterValue));
+           }
+           return sorted;
        },
-        listEmpty: (state) => state.ipItems.length === 0
+        listEmpty: (state) => state.items.length === 0
 
     },
     actions: {
@@ -59,13 +64,19 @@ export const useIpStore = defineStore('iplist', {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 const { query, city, country } = el;
-                this.ipItems.push({ time: String(+Date.now()), ip: query, city, country })
+                this.items.push({ time: String(+Date.now()), ip: query, city, country })
             });
         },
         sort(payload: Sorting) {
             const { field, direction } = payload;
             this.sortBy = field;
             this.sortOrder = direction;
+        },
+        deleteIp(ip: string) {
+          this.items = this.items.filter((row: IpInfo) => row.ip !== ip);
+        },
+        filter(search: string) {
+            this.filterValue = search;
         }
     },
 })

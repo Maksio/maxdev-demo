@@ -61,22 +61,21 @@ watch(activeState, (v) => {
   const sorter = { field: props.field, direction: activeState.value?.direction };
   store.sort(sorter);
 })
-
 </script>
 
 <style>
 .sort-button {
   font-family: 'Inter';
-  font-size: 13px;
-  font-weight: 500;
-  line-height: 20px;
-  text-align: left;
   border-radius: 4px;
   border: none;
   max-height: 24px;
   height: 24px;
 }
+
 .sort-button .el-dropdown button {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 20px;
   padding: 4px 8px;
   background: #F2F0F0;
   color: #929496;
