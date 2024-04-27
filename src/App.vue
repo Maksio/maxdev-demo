@@ -1,17 +1,37 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
-  <router-view/>
+  <div class="common-layout">
+    <top-navigation></top-navigation>
+    <div class="page-content">
+      <router-view/>
+    </div>
+  </div>
 </template>
 
-<style lang="stylus">
-#app
-  font-family Avenir, Helvetica, Arial, sans-serif
-  -webkit-font-smoothing antialiased
-  -moz-osx-font-smoothing grayscale
-  text-align center
-  color #2c3e50
-  margin-top 60px
+
+<script setup lang="ts">
+
+import TopNavigation from "@/components/layout/TopNavigation.vue";
+</script>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Poppins;
+}
+
+.common-layout {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  width: 100vw;
+}
+
+.page-content
+{
+  display: block;
+  padding: 80px 100px;
+}
 </style>
