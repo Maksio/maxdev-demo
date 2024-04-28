@@ -1,4 +1,5 @@
 import {defineStore} from 'pinia'
+import {ElMessage} from "element-plus";
 
 const makeRequest = async (ip: string) => {
     let response;
@@ -75,6 +76,11 @@ export const useIpStore = defineStore('iplist', {
                 const randomInt = query.split('.').reduce((a: string, b: string) => Number(a) + Number(b)) % 3;
                 const states: IpState[] = ['success', 'busy', 'fail'];
                 const state: IpState = states[randomInt];
+
+                ElMessage({
+                    message: `IP ${query} was added to table`,
+                    type: 'success',
+                })
 
                 this.items.push({time: String(+Date.now()), ip: query, city, country, state})
             });

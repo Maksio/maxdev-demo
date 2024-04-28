@@ -10,7 +10,6 @@
       style="width: 100%; height: 336px; max-height: 336px;"
       cell-class-name="ip-table__cell"
       row-class-name="ip-table__row"
-      header-row-style="box-shadow: 0px 4px 8px 0px #0000001F;"
       border
       class="custom-border"
       @selection-change="onSelectRow"

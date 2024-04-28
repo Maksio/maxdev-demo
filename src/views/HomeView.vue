@@ -1,7 +1,7 @@
 <template>
   <div class="home-view">
     <div class="view" v-if="listEmpty">
-      <ip-multi-search/>
+      <ip-multi-search />
     </div>
     <div class="view" v-else>
       <ip-table/>
