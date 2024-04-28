@@ -48,6 +48,7 @@ export const useIpStore = defineStore('iplist', {
             }
             return sorted;
         },
+        presentIps: (state) => state.items.map((item: IpInfo) => item.ip),
         listEmpty: (state): boolean => state.items.length === 0,
     },
     actions: {
@@ -55,8 +56,13 @@ export const useIpStore = defineStore('iplist', {
             if (!Array.isArray(payload)) return;
 
             const queue: Promise<string>[] = [];
-
-            [...new Set(payload)].forEach(ip => queue.push(makeRequest(ip)));
+            const presented = this.presentIps;
+            [...new Set(payload)].forEach(ip => {
+                if (!presented.includes(ip))
+                {
+                    queue.push(makeRequest(ip))
+                }
+            });
 
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
@@ -83,6 +89,9 @@ export const useIpStore = defineStore('iplist', {
         },
         filter(search: string) {
             this.filterValue = search;
+        },
+        getIpInfo(ip?: string) {
+            return ip && this.items.filter((item: IpInfo) => item.ip === ip).pop();
         }
     },
 })

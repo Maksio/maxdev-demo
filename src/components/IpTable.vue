@@ -48,7 +48,7 @@
              @mouseenter="hoveredIp = scope.row.ip"
              @mouseleave="hoveredIp = null"
         >
-          <div class="flex center">
+          <div class="flex center clickable" @click="$router.push({ name: 'info', query: { ip: scope.row.ip}})">
             <flag-image :country="scope.row.country"/>
             {{ scope.row.ip }}
           </div>
@@ -179,6 +179,9 @@ watch(tableSearch, () => {
   background: #f7f7f7;
 }
 
+.clickable {
+  cursor: pointer;
+}
 .flex {
   display: flex;
 }
