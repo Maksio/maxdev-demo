@@ -1,14 +1,15 @@
 <template>
-  <div class="state-button" :class="buttonClass">
-    <el-tooltip placement="top"
-                effect="light"
-                offset="20"
-                raw-content
-                :content="tooltipContent"
-    >
-      <img :src="actionSrc[state].url">
-    </el-tooltip>
-  </div>
+
+  <el-tooltip placement="top"
+              effect="light"
+              raw-content
+              :content="tooltipContent"
+  >
+    <div class="state-button" :class="buttonClass">
+      <img :src="actionSrc[state].url" alt="">
+    </div>
+  </el-tooltip>
+
 </template>
 
 <script setup lang="ts">
@@ -52,6 +53,7 @@ const tooltipContent = computed(() =>
   justify-content: center;
   width: 44px;
   height: 44px;
+  border-radius: 2px;
   cursor: pointer;
 }
 

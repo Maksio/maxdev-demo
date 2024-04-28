@@ -1,8 +1,10 @@
 <template>
-  <div class="common-layout">
-    <top-navigation></top-navigation>
-    <div class="page-content">
-      <router-view/>
+  <div class="layout-container">
+    <div class="layout">
+      <top-navigation></top-navigation>
+      <div class="page-content">
+        <router-view/>
+      </div>
     </div>
   </div>
 </template>
@@ -19,14 +21,22 @@ import TopNavigation from "@/components/layout/TopNavigation.vue";
 }
 
 body {
-  font-family: 'Poppins';
+  font-family: 'Poppins', Arial, sans-serif;
+  background: black;
 }
-
-.common-layout {
+.layout-container {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  height: 100%;
+  justify-content: center;
+}
+.layout {
   display: flex;
   flex-direction: column;
   margin: 0;
-  width: 100vw;
+  width: 1440px;
+  background: white;
 }
 
 .page-content

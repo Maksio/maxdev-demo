@@ -1,6 +1,6 @@
 <template>
   <div class="top-navigation">
-    <div class="top-navigation__logo">IP-PN.COM</div>
+    <div class="top-navigation__logo" @click="$router.push('/')">IP-PN.COM</div>
     <div class="top-navigation__search">
       <div class="ip-search">
         <ip-search v-model="ipSearch" confirm></ip-search>
@@ -32,13 +32,9 @@ watch(ipSearch, () => {
 </script>
 
 <style>
-.debug {
-  border: 1px dashed red;
-}
-
 .top-navigation {
   display: grid;
-  grid-template-columns: 1fr 4fr 3fr;
+  grid-template-columns: repeat(3, 1fr);
   align-items: center;
   gap: 16px;
   padding: 10px 100px;
@@ -50,9 +46,12 @@ watch(ipSearch, () => {
 .top-navigation__logo {
   font-size: 24px;
   color: #0E2E3B;
+  cursor: pointer;
 }
 
 .top-navigation__menu {
+  display: flex;
+  justify-content: flex-end;
   color: #494949;
 }
 

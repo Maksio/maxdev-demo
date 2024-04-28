@@ -50,7 +50,7 @@ type QueryType = {
 }
 watch(confirmValue, debounce(() => {
   if (props.mapQuery) {
-    const query: QueryType = { query: {}};
+    const query: QueryType = {query: {}};
     if (confirmValue.value) {
       query.query.search = confirmValue.value
     }
@@ -64,10 +64,16 @@ watch(confirmValue, debounce(() => {
 <style>
 .search-input {
   max-width: 460px;
+  height: 44px;
 }
 
 .search-input .el-input__inner {
-  margin: 8px 12px 8px 4px;
+  margin: 9px 12px 7px 4px;
+  color: #8A8A8A;
+}
+
+.search-input .el-input__wrapper {
+  padding-left: 16px;
 }
 
 .search-input input.el-input__inner,

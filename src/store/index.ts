@@ -1,19 +1,16 @@
 import {defineStore} from 'pinia'
-import {computed} from "vue";
 
 const makeRequest = async (ip: string) => {
+    let response;
     try {
-        const response = await fetch(`http://ip-api.com/json/${ip}`);
-        return response.json();
+        response = await fetch(`http://ip-api.com/json/${ip}`);
+        if (response.ok) {
+            return response.json();
+        }
     } catch (error) {
-        console.error('Error fetching ip api', error);
+        console.error('API error', error);
     }
-}
-
-type IpResponse = {
-    city: string;
-    country: string;
-    query: string;
+    return Promise.reject(response);
 }
 
 export type IpState = 'success' | 'busy' | 'fail';
@@ -41,18 +38,17 @@ export const useIpStore = defineStore('iplist', {
     },
     getters: {
         sortedList: (state) => {
-           const key = state.sortBy as keyof IpInfo || 'time';
-           const dir = state.sortOrder == 'asc' ? -1 : 1;
+            const key = state.sortBy as keyof IpInfo || 'time';
+            const dir = state.sortOrder == 'asc' ? -1 : 1;
 
-           const sorted = state.items.sort((a: IpInfo, b: IpInfo) => a[key].localeCompare(b[key]) * dir);
+            const sorted = state.items.sort((a: IpInfo, b: IpInfo) => a[key].localeCompare(b[key]) * dir);
 
-           if (state.filterValue) {
-               return sorted.filter((row: IpInfo) => row.ip.includes(state.filterValue));
-           }
-           return sorted;
-       },
-        listEmpty: (state) => state.items.length === 0
-
+            if (state.filterValue) {
+                return sorted.filter((row: IpInfo) => row.ip.includes(state.filterValue));
+            }
+            return sorted;
+        },
+        listEmpty: (state): boolean => state.items.length === 0,
     },
     actions: {
         async search(payload: string[]) {
@@ -60,7 +56,7 @@ export const useIpStore = defineStore('iplist', {
 
             const queue: Promise<string>[] = [];
 
-            payload.forEach(ip => queue.push(makeRequest(ip)));
+            [...new Set(payload)].forEach(ip => queue.push(makeRequest(ip)));
 
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
@@ -69,21 +65,21 @@ export const useIpStore = defineStore('iplist', {
             results.forEach((el: string) => {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
-                const { query, city, country } = el;
+                const {query, city, country} = el;
                 const randomInt = query.split('.').reduce((a: string, b: string) => Number(a) + Number(b)) % 3;
                 const states: IpState[] = ['success', 'busy', 'fail'];
                 const state: IpState = states[randomInt];
-                console.log('state', state)
-                this.items.push({ time: String(+Date.now()), ip: query, city, country, state })
+
+                this.items.push({time: String(+Date.now()), ip: query, city, country, state})
             });
         },
         sort(payload: Sorting) {
-            const { field, direction } = payload;
+            const {field, direction} = payload;
             this.sortBy = field;
             this.sortOrder = direction;
         },
         deleteIp(ip: string) {
-          this.items = this.items.filter((row: IpInfo) => row.ip !== ip);
+            this.items = this.items.filter((row: IpInfo) => row.ip !== ip);
         },
         filter(search: string) {
             this.filterValue = search;
